@@ -50,16 +50,69 @@
     <button id="playBtn">CLICK TO PLAY</button>
 </div>
 
-<div id="gameScreen">
-    Game will start here 🚀
-</div>
+<canvas id="gameCanvas"></canvas>
 
 <script>
-    document.getElementById("playBtn").onclick = function(){
-        document.getElementById("startScreen").style.display = "none";
-        document.getElementById("gameScreen").style.display = "flex";
+let canvas = document.getElementById("gameCanvas");
+let ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let gravity = 0.6;
+let bottle = {
+    x: 200,
+    y: canvas.height - 150,
+    width: 40,
+    height: 100,
+    velocityY: 0,
+    rotation: 0,
+    rotationSpeed: 0,
+    jumping: false
+};
+
+function drawBottle(){
+    ctx.save();
+    ctx.translate(bottle.x, bottle.y);
+    ctx.rotate(bottle.rotation);
+    ctx.fillStyle = "#2ecc71";
+    ctx.fillRect(-20, -50, bottle.width, bottle.height);
+    ctx.restore();
+}
+
+function update(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    bottle.velocityY += gravity;
+    bottle.y += bottle.velocityY;
+    bottle.rotation += bottle.rotationSpeed;
+
+    if(bottle.y > canvas.height - 100){
+        bottle.y = canvas.height - 100;
+        bottle.velocityY = 0;
+        bottle.rotationSpeed = 0;
+        bottle.jumping = false;
     }
+
+    drawBottle();
+    requestAnimationFrame(update);
+}
+
+canvas.addEventListener("click", function(){
+    if(!bottle.jumping){
+        bottle.velocityY = -15;
+        bottle.rotationSpeed = 0.2;
+        bottle.jumping = true;
+    }
+});
+
+document.getElementById("playBtn").onclick = function(){
+    document.getElementById("startScreen").style.display = "none";
+    canvas.style.display = "block";
+    update();
+}
 </script>
+
 
 </body>
 </html>
